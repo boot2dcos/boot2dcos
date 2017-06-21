@@ -1,0 +1,9 @@
+version: '3.2'
+
+services:
+  squid:
+    image: sameersbn/squid:3.3.8-23
+    ports:
+      - "3128:3128"
+    volumes:
+      - /srv/docker/squid/cache:/var/spool/squid3

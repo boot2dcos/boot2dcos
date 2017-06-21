@@ -1,0 +1,42 @@
+version: '3.2'
+services:
+  pixiecore:
+    image: danderson/pixiecore
+    network_mode: "host"
+    volumes:
+      - ${BOOT2DCOS_BAREMETAL_IMAGES}:/image
+    command: api http://api.service.boot2dcos:81/ -d
+    dns: ${BOOT2DCOS_HOST}
+    depends_on: 
+      - proxy
+  baremetal:
+    image: boot2dcos/baremetal
+    ports:
+      - "8081:8081"
+    dns: ${BOOT2DCOS_HOST}
+    environment:
+      - BOOT2DCOS_HOST=${BOOT2DCOS_HOST}
+      - BOOT2DCOS_DATACENTER_NAME=${BOOT2DCOS_DATACENTER_NAME}
+      - BOOT2DCOS_GATEWAY=${BOOT2DCOS_GATEWAY}
+    volumes:
+      - genconf:/genconf
+    depends_on: 
+      - consul
+  proxy:
+    image: traefik:1.3.0
+    command: --web --logLevel=INFO
+    networks:
+      - webgateway
+    ports:
+      - "81:80"
+      - "8085:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik/boot2dcos-lb.toml:/etc/traefik/traefik.toml
+    dns: ${BOOT2DCOS_HOST}
+    depends_on: 
+      - consul
+
+networks:
+  webgateway:
+    driver: bridge

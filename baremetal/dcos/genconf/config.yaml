@@ -1,0 +1,26 @@
+---
+bootstrap_url: http://192.168.3.101:81/v1/install
+cluster_name: 'boot2dcos'
+exhibitor_storage_backend: static
+ip_detect_filename: /genconf/ip-detect
+master_discovery: static
+master_list:
+  - 192.168.3.250
+
+resolvers:
+  - 8.8.8.8
+  
+oauth_enabled: 'false'
+telemetry_enabled: 'false'
+
+use_proxy: 'true'
+http_proxy: http://192.168.3.101:3128
+https_proxy: https://192.168.3.101:3128
+no_proxy: 
+  - '.boot2dcos'
+  - '.mesos'
+  - '.thisdcos.directory'
+  - '.dcos.directory'
+  - '.zk'
+  - '127.0.0.1'
+  - 'localhost'

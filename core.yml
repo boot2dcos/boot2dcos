@@ -1,0 +1,33 @@
+version: '3.2'
+services:
+  consul:
+    image: consul:${TAG:-latest}
+    network_mode: "host"
+    environment:
+      - CONSUL_ALLOW_PRIVILEGED_PORTS=
+    command: agent -dns-port=53 -recursor=8.8.8.8 -ui -server -bind=${BOOT2DCOS_HOST} -client=${BOOT2DCOS_HOST} -bootstrap-expect=1 -domain boot2dcos -datacenter ${BOOT2DCOS_DATACENTER_NAME}
+    volumes: 
+      - ./consul/config:/consul/config
+    dns: ${BOOT2DCOS_HOST}
+  core:
+    image: boot2dcos/core
+    dns: ${BOOT2DCOS_HOST}
+    ports:
+      - "8080:8080" 
+    environment:
+      - BOOT2DCOS_HOST=${BOOT2DCOS_HOST}
+    depends_on: 
+      - consul
+  genconf:
+    image: boot2dcos/genconf:1.9.0
+    dns: ${BOOT2DCOS_HOST}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on: 
+      - consul
+volumes:
+  genconf:
+     driver_opts:
+        type: none
+        device: ${BOOT2DCOS_HOME}/baremetal/dcos/genconf #NOTE needs full path (~ doesn't work)
+        o: bind

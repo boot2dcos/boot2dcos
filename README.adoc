@@ -1,0 +1,72 @@
+// Settings:
+:idprefix:
+:idseparator: -
+ifndef::env-github[:icons: font]
+ifdef::env-github,env-browser[]
+:toc: macro
+:toclevels: 1
+endif::[]
+ifdef::env-github[]
+:status:
+:outfilesuffix: .adoc
+:!toc-title:
+:caution-caption: :fire:
+:important-caption: :exclamation:
+:note-caption: :paperclip:
+:tip-caption: :bulb:
+:warning-caption: :warning:
+endif::[]
+// URIs:
+:uri-project: https://github.com/boot2dcos
+:uri-project-repo: {uri-project}/{project-name}
+:uri-project-issues: {uri-project-repo}/issues
+
+// Aliases:
+:project-name: boot2dcos
+:description: The fastest way to boot your DC/OS cluster from scratch.
+
+= {project-name}: {description}
+Jauffrey Flach <https://github.com/jauffrey[@jauffrey]>; Benjamin Vouillaume <https://github.com/vbenji[@vbenji]>
+
+
+ifdef::status[]
+image:https://img.shields.io/badge/license-Apache%202.0-blue.svg[Apache 2.0 License, link=#copyright]
+endif::[]
+
+
+== Running {project-name}
+To run boot2dcos, simply clone this repository and follow these steps: 
+
+. customize your config.yaml file using the https://dcos.io/docs/1.9/installing/custom/configuration/configuration-parameters/#docs-article[DC/OS Configuration reference]
+. Get CoreOS images (https://alpha.release.core-os.net/amd64-usr/current/coreos_production_pxe.vmlinuz[coreos_production_pxe.vmlinuz], https://alpha.release.core-os.net/amd64-usr/current/coreos_production_pxe_image.cpio.gz[coreos_production_pxe_image.cpio.gz]) 
+. Create a https://docs.docker.com/compose/env-file/[.env] file or set the following environment variables:
+    
+    BOOT2DCOS_HOST: The ip of your docker host 
+    BOOT2DCOS_HOME: Path to boot2dcos (your local clone of this repo)
+    BOOT2DCOS_BAREMETAL_IMAGES: When using baremetal module, this is the full path to the CoreOS images 
+    BOOT2DCOS_GATEWAY: An optional gateway IP Address when not using the proxy module
+
+. Launch the compose script
+
+    docker-compose -f <module1.yml> -f <module2.yml> -f .....
+
+The module list: 
+
+    * core.yml: The core module and base components
+    * baremetal.yml : The baremetal module to boot physical machines using iPXE
+    * proxy.yml : A simple squid proxy
+
+In most cases you will just have to launch boot2dcos with : 
+
+    docker-compose -f core.yml -f baremetal.yml -f proxy.yml up
+
+
+== Authors
+
+{project-name} was written by https://github.com/jauffrey[Jauffrey Flach] and https://github.com/vbenji[Benjamin Vouillaume].
+
+== Copyright
+
+Copyright (C) 2017 The boot2dcos Project. 
+
+For the full text of the license, see the <<LICENSE#,LICENSE>> file.
