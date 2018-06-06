@@ -1,0 +1,5 @@
+terraform/.terraform
+terraform/certs/**
+!terraform/certs/cert-gen
+!terraform/certs/openssl.conf
+baremetal/matchbox/var/lib/matchbox/assets/**
