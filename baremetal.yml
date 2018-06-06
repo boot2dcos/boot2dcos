@@ -1,42 +1,52 @@
 version: '3.2'
 services:
-  pixiecore:
-    image: danderson/pixiecore
-    network_mode: "host"
-    volumes:
-      - ${BOOT2DCOS_BAREMETAL_IMAGES}:/image
-    command: api http://api.service.boot2dcos:81/ -d
-    dns: ${BOOT2DCOS_HOST}
-    depends_on: 
-      - proxy
-  baremetal:
-    image: boot2dcos/baremetal
+  matchbox:
+    image: quay.io/coreos/matchbox:latest
     ports:
-      - "8081:8081"
+      - "8087:8087"
+      - "8088:8088"
+    volumes:
+      - ./baremetal/matchbox/var/lib/matchbox:/var/lib/matchbox:Z
+      - ./terraform/certs:/etc/matchbox:Z
     dns: ${BOOT2DCOS_HOST}
+    command: "-address=0.0.0.0:8087 -rpc-address=0.0.0.0:8088 -log-level=debug"
     environment:
-      - BOOT2DCOS_HOST=${BOOT2DCOS_HOST}
-      - BOOT2DCOS_DATACENTER_NAME=${BOOT2DCOS_DATACENTER_NAME}
-      - BOOT2DCOS_GATEWAY=${BOOT2DCOS_GATEWAY}
-    volumes:
-      - genconf:/genconf
+      - SERVICE_TAGS=traefik.frontend.rule=PathPrefix:/
     depends_on: 
-      - consul
-  proxy:
-    image: traefik:1.3.0
-    command: --web --logLevel=INFO
-    networks:
-      - webgateway
-    ports:
-      - "81:80"
-      - "8085:8080"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./traefik/boot2dcos-lb.toml:/etc/traefik/traefik.toml
+     - registrator
+     - certsgen 
+  dnsmasq:
+    image: quay.io/coreos/dnsmasq
+    network_mode: "host"
     dns: ${BOOT2DCOS_HOST}
+    cap_add:
+      - NET_ADMIN
+    command: -d -k --port=54 --dhcp-range=${BOOT2DCOS_HOST},proxy,255.255.255.0 --dhcp-range=192.168.99.1,proxy,255.255.255.0 --enable-tftp --tftp-root=/var/lib/tftpboot --dhcp-userclass=set:ipxe,iPXE --pxe-service=tag:#ipxe,x86PC,"PXE chainload to iPXE",undionly.kpxe --pxe-service=tag:ipxe,x86PC,"iPXE",http://${BOOT2DCOS_HOST}:81/boot.ipxe --log-queries --log-dhcp
+    restart: always
     depends_on: 
       - consul
-
+  certsgen:
+    image: centurylink/openssl
+    volumes:
+      - ./terraform:/terraform
+    working_dir: /terraform/certs
+    command: "./cert-gen"
+    environment: 
+      - SAN=DNS.1:matchbox-8087.service.boot2dcos,IP.1:${BOOT2DCOS_HOST}
+  terraform-baremetal:
+    image: boot2dcos/terraform-baremetal
+    dns: ${BOOT2DCOS_HOST}
+    volumes:
+      - ./terraform:/terraform
+    environment: 
+      - TF_VAR_boot2dcos_host=${BOOT2DCOS_HOST}
+      - TF_VAR_matchbox_http_endpoint="http://${BOOT2DCOS_HOST}:8087"
+      - TF_VAR_matchbox_rpc_endpoint="${BOOT2DCOS_HOST}:8088"
+      - TF_VAR_ssh_authorized_key="boot2dcos"
+    command: "apply -auto-approve"
+    restart: on-failure
+    depends_on: 
+     - matchbox
 networks:
   webgateway:
     driver: bridge

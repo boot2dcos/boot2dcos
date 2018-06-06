@@ -1,0 +1,8 @@
+{
+	"id": "default",
+	"profile": "coreos-install",
+	"metadata": {
+		"ignition_endpoint": "http://192.168.0.24:8087/ignition",
+		"ssh_authorized_key": "boot2dcos"
+	}
+}

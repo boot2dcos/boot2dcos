@@ -1,0 +1,5 @@
+{
+	"id": "simple",
+	"ignition_id": "simple.yaml.tmpl",
+	"boot": {}
+}

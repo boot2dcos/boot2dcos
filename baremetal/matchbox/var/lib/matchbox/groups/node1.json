@@ -1,0 +1,10 @@
+{
+	"id": "node1",
+	"profile": "simple",
+	"selector": {
+		"os": "installed"
+	},
+	"metadata": {
+		"ssh_authorized_key": "boot2dcos"
+	}
+}

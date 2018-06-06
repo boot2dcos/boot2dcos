@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# USAGE: ./scripts/get-coreos
+# USAGE: ./scripts/get-coreos channel version dest
+#
+# ENV VARS:
+# - OEM_ID - specify OEM image id to download, alongside the default one
+curl -L https://raw.githubusercontent.com/coreos/matchbox/master/scripts/get-coreos | bash -s "stable" "1576.5.0" "$PWD/var/lib/matchbox/assets"
