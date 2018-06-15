@@ -12,6 +12,7 @@ services:
     command: "-address=0.0.0.0:8087 -rpc-address=0.0.0.0:8088 -log-level=debug"
     environment:
       - SERVICE_TAGS=traefik.frontend.rule=PathPrefix:/
+    restart: always
     depends_on: 
      - registrator
      - certsgen 
@@ -44,7 +45,7 @@ services:
       - TF_VAR_matchbox_rpc_endpoint="${BOOT2DCOS_HOST}:8088"
       - TF_VAR_ssh_authorized_key="boot2dcos"
     command: "apply -auto-approve"
-    restart: on-failure
+    restart: always
     depends_on: 
      - matchbox
 networks:

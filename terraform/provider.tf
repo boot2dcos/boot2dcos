@@ -5,3 +5,8 @@ provider "matchbox" {
   client_key  = "${file("/terraform/certs/client.key")}"
   ca          = "${file("/terraform/certs/ca.crt")}"
 }
+
+provider "consul" {
+  address    = "192.168.99.100:8500"
+  datacenter = "baremetal"
+}

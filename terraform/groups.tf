@@ -1,7 +1,7 @@
 // Default matcher group for machines
-resource "matchbox_group" "default" {
-  name    = "default"
-  profile = "${matchbox_profile.coreos-install.name}"
+resource "matchbox_group" "slave" {
+  name    = "slave"
+  profile = "${matchbox_profile.coreos-slave.name}"
 
   # no selector means all machines can be matched
   metadata {

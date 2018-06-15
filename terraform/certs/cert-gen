@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # note: Script uses -batch and -subj, instead of interactive prompts.
 set -e
 
@@ -13,7 +13,9 @@ fi
 echo "Creating example CA, server cert/key, and client cert/key..."
 
 # basic files/directories
-mkdir -p {certs,crl,newcerts}
+mkdir -p certs
+mkdir -p crl
+mkdir -p newcerts
 touch index.txt
 touch index.txt.attr
 echo 1000 > serial

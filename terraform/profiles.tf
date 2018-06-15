@@ -1,6 +1,15 @@
 // Create a CoreOS-install profile
-resource "matchbox_profile" "coreos-install" {
-  name   = "coreos-install"
+data "consul_keys" "app" {
+  key {
+    name    = "enabled"
+    path    = "masters"
+    default = "1"
+  }
+}
+
+resource "matchbox_profile" "coreos-slave" {
+  count  = "${data.consul_keys.app.var.enabled}"
+  name   = "coreos-slave"
   kernel = "${var.matchbox_http_endpoint}/assets/coreos/1576.5.0/coreos_production_pxe.vmlinuz"
 
   initrd = [
